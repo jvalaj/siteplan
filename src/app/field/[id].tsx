@@ -38,6 +38,7 @@ import {
   nextHeading,
   remeasureWall,
   removeFeature,
+  removeWall,
   reopen,
   stamp,
   type Turn,
@@ -159,13 +160,13 @@ function Editor({ layout }: { layout: Layout }) {
       };
     }
   } else if (!wallInFocus) {
-    armed = { kind: 'none', text: 'Add a wall first.' };
+    armed = { kind: 'none', text: 'Add a wall first. Tap Walls, then Read.' };
   } else if (mode === 'features') {
     const what = FEATURE_LABELS[featureKind];
     armed =
       offset === undefined
-        ? { kind: 'offset', wallId: wallInFocus.id, text: `${what} · from the yellow corner` }
-        : { kind: 'width', wallId: wallInFocus.id, text: `${what} · how wide` };
+        ? { kind: 'offset', wallId: wallInFocus.id, text: `${what} · 1 of 2 · distance from yellow corner` }
+        : { kind: 'width', wallId: wallInFocus.id, text: `${what} · 2 of 2 · how wide` };
   } else {
     const targetId = selectedFeature?.id ?? wallInFocus.id;
     armed = {
@@ -226,6 +227,8 @@ function Editor({ layout }: { layout: Layout }) {
         setOffset(valueMm);
         setResult({ text: `${shown} from the corner`, tone: 'green' });
         feedback.done();
+        // typed the distance, so ask for the width straight away.
+        if (source === 'typed') setKeypad(true);
       }
     } else if (armed.kind === 'width') {
       finishFeature(armed.wallId, offset ?? 0, valueMm, source);
@@ -520,6 +523,8 @@ function Editor({ layout }: { layout: Layout }) {
                           onPress={() => {
                             setFeatureKind(kind);
                             setOffset(undefined);
+                            // no tape on the phone yet, so open the keypad for the distance.
+                            if (wallInFocus) setKeypad(true);
                           }}
                         />
                       ))}
@@ -573,7 +578,7 @@ function Editor({ layout }: { layout: Layout }) {
         )}
 
         <PadRow>
-          {selectedFeature && mode === 'features' ? (
+          {selectedFeature || selectedWall ? (
             <Button
               cell
               stacked
@@ -582,7 +587,15 @@ function Editor({ layout }: { layout: Layout }) {
               kind="destructive"
               size="primary"
               onPress={() => {
-                commit(removeFeature(layout, selectedFeature.id), 'Removed', undefined, 'orange');
+                const what = describe(layout, selectedId);
+                commit(
+                  selectedFeature
+                    ? removeFeature(layout, selectedFeature.id)
+                    : removeWall(layout, selectedWall!.id),
+                  `${what} removed`,
+                  undefined,
+                  'orange',
+                );
                 setSelectedId(undefined);
               }}
             />
@@ -628,6 +641,8 @@ function Editor({ layout }: { layout: Layout }) {
   );
 
   // shows what the next tape press will do; on the plan on phones, atop the panel on big screens.
+  // doors and sizes need a wall to sit on, so warn instead of showing a next step.
+  const needsWall = armed.kind === 'none' && walls.length === 0;
   const nextBar = (
     <View
       pointerEvents="box-none"
@@ -635,18 +650,18 @@ function Editor({ layout }: { layout: Layout }) {
       style={[
         styles.next,
         sideBySide && styles.nextDocked,
-        { backgroundColor: theme.keyDark, borderColor: theme.seam },
+        { backgroundColor: needsWall ? theme.red : theme.keyDark, borderColor: theme.seam },
       ]}>
-      {/* "next" is a little yellow sticker stuck over the top edge of the display. */}
+      {/* "next" is a little yellow sticker stuck over the top edge; "!" when something must come first. */}
       <View style={[styles.sticker, { backgroundColor: theme.accent, borderColor: theme.seam }]}>
         <T variant="footnote" color="keyInk" style={styles.stickerText}>
-          NEXT
+          {needsWall ? '  !  ' : 'NEXT'}
         </T>
       </View>
       <T
         variant={sideBySide ? 'title2' : 'title3'}
-        color="onDark"
-        numberOfLines={sideBySide ? 2 : 1}
+        color={needsWall ? 'onRed' : 'onDark'}
+        numberOfLines={2}
         style={styles.nextText}>
         {armed.text}
       </T>

@@ -61,6 +61,20 @@ export function addFeature(
   return { layout: { ...layout, features: [...layout.features, feature] }, id: feature.id };
 }
 
+/** drops a wall plus what sits on it; later walls slide back and the gap shows, so the shape reopens. */
+export function removeWall(layout: Layout, wallId: string): Layout {
+  const gone = new Set(layout.features.filter((f) => f.wallId === wallId).map((f) => f.id));
+  return {
+    ...layout,
+    closed: false,
+    walls: layout.walls.filter((w) => w.id !== wallId),
+    features: layout.features.filter((f) => f.wallId !== wallId),
+    measurements: layout.measurements.filter(
+      (m) => m.targetId !== wallId && !gone.has(m.targetId),
+    ),
+  };
+}
+
 export function removeFeature(layout: Layout, featureId: string): Layout {
   return {
     ...layout,

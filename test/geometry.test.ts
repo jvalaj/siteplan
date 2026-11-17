@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { addFeature, addWall, closeShape, remeasureWall, stamp } from '../src/shared/edit';
+import { addFeature, addWall, closeShape, remeasureWall, removeWall, stamp } from '../src/shared/edit';
 import { feetInchesToMm, formatArea, formatFeetInches, formatLength } from '../src/shared/format';
 import {
   areaMm2,
@@ -174,5 +174,19 @@ describe('which copy is newer', () => {
     expect(isNewer(a, b)).toBe(false);
     expect(isNewer({ ...a, updatedAt: a.updatedAt + 1 }, a)).toBe(true);
     expect(isNewer(a, a)).toBe(false);
+  });
+});
+
+describe('removeWall', () => {
+  it('drops the wall and its doors, and reopens the shape', () => {
+    let layout = walk([[3000, 90], [2000, 90], [3000, 90], [2000, 90]]);
+    layout = { ...layout, closed: true };
+    const wallId = layout.walls[1].id;
+    layout = addFeature(layout, wallId, 'door', 500, 900, 'tape').layout;
+    const after = removeWall(layout, wallId);
+    expect(after.walls).toHaveLength(3);
+    expect(after.features).toHaveLength(0);
+    expect(after.closed).toBe(false);
+    expect(closingGap(after.walls).distanceMm).toBeGreaterThan(1000);
   });
 });
