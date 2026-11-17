@@ -25,7 +25,7 @@ import {
 /** the size of a wall's number key, in screen points. */
 const BADGE = 30;
 
-// the browser draws svg text in a serif font unless told otherwise. phones use the system font.
+// browsers draw svg text in a serif font by default; phones use the system font.
 const FONT = Platform.OS === 'web' ? 'system-ui, -apple-system, sans-serif' : undefined;
 
 /** how the office view is zoomed and moved. zoom 1 with no pan means "fit the whole plan". */
@@ -47,10 +47,7 @@ type Props = {
   highlightId?: string;
   /** draws a dashed arrow from the open end, showing which way the next wall will go. */
   ghostHeading?: number;
-  /**
-   * a wall whose starting corner dana measures from. it gets a marker and an arrow along the
-   * wall, so "how far from the corner" always means the same corner.
-   */
+  /** the corner dana measures from, with a marker and arrow so "from the corner" is clear. */
   measureFromWallId?: string;
   /** the wall or feature that was just added. it animates in, so the eye goes straight to it. */
   animateId?: string;
@@ -59,13 +56,7 @@ type Props = {
   thumbnail?: boolean;
 };
 
-/**
- * draws a layout: walls, features, and a length on every wall. the field editor and the
- * office viewer both use it, so dana and marcus always see the same picture.
- *
- * everything is positioned in screen points rather than scaled as a whole, so lines and
- * text stay the same thickness and size at any zoom.
- */
+/** draws walls, features and lengths; field and office share it so both see the same plan. */
 export function LayoutCanvas({
   layout,
   units,
@@ -106,8 +97,7 @@ export function LayoutCanvas({
     Math.max(size.width - marginX * 2, 10) / fitWidth,
     Math.max(size.height - marginY * 2, 10) / fitHeight,
   );
-  // when a new wall makes the plan bigger, glide to the new fit instead of jumping, so the
-  // walls already drawn stay easy to follow.
+  // when the plan grows, glide to the new fit instead of jumping so old walls stay easy to track.
   const moving = !useReduceMotion() && !thumbnail;
   const camera = useEased(
     { scale: fitScale, x: (fitted.minX + fitted.maxX) / 2, y: (fitted.minY + fitted.maxY) / 2 },
@@ -128,9 +118,7 @@ export function LayoutCanvas({
     const b = screen[i + 1];
     return { x: (a.x + b.x) / 2 - out.x * 24, y: (a.y + b.y) / 2 - out.y * 24 };
   };
-  // on a narrow plan (a thin deck, zoomed out on a phone) two opposite walls can put their
-  // numbers on the same spot. when that happens, both numbers step half a badge along their
-  // own walls. opposite walls run opposite ways, so they part like a zipper and stay readable.
+  // on thin plans opposite wall numbers can overlap, so each slides half a badge along its wall.
   const badges: Point[] = [];
   const alongs: Point[] = [];
   const step = BADGE / 2 + 5;
@@ -150,8 +138,7 @@ export function LayoutCanvas({
   }
   const badgeAt = (i: number): Point => badges[i];
 
-  // a to-scale grid behind the plan, like graph paper. the square size steps up as you zoom
-  // out so the lines never crowd together, and the corner of the view says what one square is.
+  // a to-scale grid like graph paper; squares grow as you zoom out so lines never crowd.
   const steps =
     units === 'imperial'
       ? [
@@ -195,8 +182,7 @@ export function LayoutCanvas({
     fontSize = labelSize,
     anchor: 'start' | 'middle' | 'end' = 'middle',
   ) {
-    // drawn twice: a thick outline in the background color, then the letters, so a label
-    // stays readable when it crosses a line.
+    // drawn twice (thick background outline, then letters) so labels stay readable over lines.
     const shared = {
       x: p.x,
       y: p.y + fontSize * 0.35,
@@ -298,8 +284,7 @@ export function LayoutCanvas({
       );
     }
 
-    // the letter sits just inside the wall, so it never lands on the wall's length label. if
-    // that would put it on the wall's number key, it slides along the wall out of the way.
+    // the letter sits just inside the wall and slides along it if it would hit the number key.
     let letterAt = { x: mid.x - out.x * 18, y: mid.y - out.y * 18 };
     const badge = badgeAt(walls.indexOf(wall));
     const clash = Math.hypot(letterAt.x - badge.x, letterAt.y - badge.y);
@@ -332,9 +317,7 @@ export function LayoutCanvas({
     );
   }
 
-  // the drawing itself is invisible to voiceover. so each wall and feature also gets an
-  // invisible 44-point button at its middle, with a spoken description. a screen reader user
-  // can swipe through the plan wall by wall, and select one, just like tapping it.
+  // voiceover can't see the drawing, so each wall gets an invisible button with a description.
   const spoken: { id: string; at: Point; label: string }[] = [];
   if (onSelect && !thumbnail && size.width > 0) {
     walls.forEach((wall, i) => {
@@ -348,7 +331,7 @@ export function LayoutCanvas({
         parts.push(`${onWall.length} ${onWall.length === 1 ? 'feature' : 'features'}`);
       spoken.push({
         id: wall.id,
-        // the invisible button sits on the wall's number key, so a tap there and voiceover agree.
+        // the invisible button sits on the wall's number key so taps and voiceover match.
         at: badgeAt(i),
         label: parts.join(', '),
       });
@@ -567,8 +550,7 @@ export function LayoutCanvas({
                 const b = screen[i + 1];
                 const out = outwardNormal(walls, wall.heading);
                 const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-                // beside an upright wall the label starts at the wall and reads away from it,
-                // so it never sits on top of the line.
+                // beside an upright wall the label reads away from it so it never sits on the line.
                 const sideways = Math.abs(out.x) > 0.5;
                 const lengthAt = sideways
                   ? { x: mid.x + out.x * 14, y: mid.y }
@@ -586,9 +568,7 @@ export function LayoutCanvas({
                       labelSize,
                       anchor,
                     )}
-                    {/* the wall's number is a small key: a dark lip under a light face, the same
-                        as the keys below the plan, so it reads as something to press. the
-                        chosen wall's key turns yellow. */}
+                    {/* the wall's number is a little key; the chosen one turns yellow. */}
                     <G {...(onSelect ? { onPress: () => onSelect(wall.id) } : {})}>
                       <Rect
                         x={numberAt.x - BADGE / 2}

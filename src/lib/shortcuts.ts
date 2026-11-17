@@ -1,13 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
-/**
- * keyboard shortcuts for a mac (or anything running the web build). on a desk, reaching for the
- * trackpad for every reading is slow, so the main keys get a letter.
- *
- * keys are named like the browser names them: 'r', ' ', 'ArrowLeft', '+', 'Escape'. add 'mod+'
- * for command (or ctrl), e.g. 'mod+z'. typing in a text field never fires a shortcut.
- */
+/** keyboard shortcuts for the web build; use browser key names, 'mod+' for cmd/ctrl. */
 export function useShortcuts(map: Record<string, () => void>, enabled = true) {
   // always call the newest handlers without re-adding the listener each render.
   const latest = useRef(map);

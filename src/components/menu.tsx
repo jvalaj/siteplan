@@ -1,11 +1,5 @@
 import { type ComponentRef, useRef, useState } from 'react';
-import {
-  Modal,
-  Pressable,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import type { IconName } from '@/components/icon';
 import { Button, Pad, PadRow } from '@/components/ui';
@@ -21,11 +15,7 @@ export type MenuItem = {
 
 const WIDTH = 240;
 
-/**
- * a "…" key that drops a short menu of keys right under itself, like the pull-down menus in
- * apple's apps. tapping anywhere else closes it. it's the same keys as the rest of the app,
- * just stacked, so nothing new to learn.
- */
+/** a "…" key that drops a small menu of keys below it; tap anywhere else to close. */
 export function MenuButton({ label, items }: { label: string; items: MenuItem[] }) {
   const anchor = useRef<ComponentRef<typeof View>>(null);
   const [at, setAt] = useState<{ top: number; right: number }>();

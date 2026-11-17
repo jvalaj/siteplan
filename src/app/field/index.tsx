@@ -19,8 +19,7 @@ export default function FieldHome() {
   const { layouts } = useSync();
   const list = sortedLayouts(layouts);
 
-  // one tap starts a plan. the name is filled in from the kind and the time, because typing
-  // a name with gloves on is the last thing dana wants to do before measuring.
+  // one tap starts a plan; the name is auto-filled since typing with gloves is a pain.
   function start(kind: SpaceKind) {
     const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     const layout = newLayout(kind, `${SPACE_LABELS[kind]} · ${time}`, 'Dana');

@@ -7,11 +7,7 @@ import { describe } from '@/shared/edit';
 import { formatLength, type Units } from '@/shared/format';
 import { type Layout, SOURCE_LABELS } from '@/shared/layout';
 
-/**
- * every wall as a row of keys: its number, its length, how it was measured. on a big screen
- * there's room for it beside the plan. marcus copies it into a cut list; dana taps a row to
- * measure that wall again. the chosen wall is latched down in yellow, like any key.
- */
+/** every wall as a row of keys; marcus copies it into a cut list, dana taps to re-measure. */
 export function WallList({
   layout,
   units,

@@ -27,18 +27,11 @@ function measure(e: GestureResponderEvent) {
   return { midX: one.pageX, midY: one.pageY, distance: 0 };
 }
 
-/**
- * drag to move and pinch to zoom, plus the same moves as plain functions so buttons can do
- * everything the gestures do.
- *
- * it uses react native's built-in PanResponder. that works the same in expo go, on ios,
- * android and the web, with nothing extra to install.
- */
+/** drag and pinch via `PanResponder`, plus plain functions so buttons can do the same. */
 export function usePanZoom() {
   const [viewport, setViewport] = useState<Viewport>(FIT);
 
-  // everything the gesture needs to remember between finger movements. it is created once
-  // and changed in place, because it must not reset when the screen re-renders mid-gesture.
+  // made once and changed in place, so a re-render mid-gesture doesn't reset it.
   const [handlers] = useState(() => {
     const g = {
       view: FIT,
@@ -72,8 +65,7 @@ export function usePanZoom() {
     const responder = PanResponder.create({
       // let taps through to the plan (to select a wall); only take over once fingers move.
       onStartShouldSetPanResponder: () => false,
-      // "capture" so the plan wins over the tappable walls and badges under the fingers.
-      // without it, a pinch that starts on a wall number stays with the wall and never zooms.
+      // "capture" so a pinch that starts on a wall number still zooms the plan.
       onMoveShouldSetPanResponderCapture: (e, move) =>
         e.nativeEvent.touches.length >= 2 || Math.abs(move.dx) + Math.abs(move.dy) > 6,
       onPanResponderTerminationRequest: () => false,
@@ -101,8 +93,7 @@ export function usePanZoom() {
       },
     });
 
-    // the zoom buttons glide to the new view, so it is clear what moved where. fingers on
-    // the glass move the plan directly, with no glide, so it never lags behind them.
+    // buttons glide to the new view; fingers move the plan directly so it never lags.
     let frame = 0;
     const glideTo = (target: Viewport) => {
       cancelAnimationFrame(frame);
@@ -120,8 +111,7 @@ export function usePanZoom() {
       frame = requestAnimationFrame(tick);
     };
 
-    // on a mac, a trackpad pinch reaches the browser as a scroll with ctrl held down, and a
-    // two-finger swipe as a plain scroll. turn those into zoom and pan, around the pointer.
+    // on a mac, trackpad pinch is ctrl+scroll and swipe is scroll; map them to zoom and pan.
     let node: HTMLElement | null = null;
     const onWheel = (e: WheelEvent) => {
       if (!node) return;
@@ -143,7 +133,7 @@ export function usePanZoom() {
       if (Platform.OS !== 'web') return;
       node?.removeEventListener('wheel', onWheel);
       node = (next as HTMLElement | null) ?? null;
-      // "passive: false" is what lets preventDefault stop the page from zooming.
+      // "passive: false" is what lets `preventDefault` stop the page from zooming.
       node?.addEventListener('wheel', onWheel, { passive: false });
     };
 

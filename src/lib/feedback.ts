@@ -1,15 +1,4 @@
-// what the app does, besides changing the screen, when something happens: a vibration and a
-// short sound. dana often can't look at the phone, and on a loud site she may not hear it, so
-// every event uses both.
-//
-// each event always feels and sounds the same:
-//   tap  - any button. a light tap and a soft tick. it is kept light on purpose: if every
-//          key buzzed hard, dana would learn to ignore the buzz that matters.
-//   done - a reading landed. the strong "success" buzz and two rising notes.
-//   oops - something needs checking. the "warning" buzz and two falling notes.
-//
-// both can be turned off on the home screen. sounds also follow the phone's silent switch,
-// like every apple app: if the ringer is off, only the buzz plays.
+// every event buzzes and plays a sound, since dana can't always look or hear on site.
 
 import { createAudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';

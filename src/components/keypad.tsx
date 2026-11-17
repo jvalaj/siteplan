@@ -7,23 +7,15 @@ import { useShortcuts } from '@/lib/shortcuts';
 import { Radius, Space, useTheme } from '@/lib/theme';
 import { feetInchesToMm, type Units } from '@/shared/format';
 
-/**
- * a number pad for when the tape isn't connected or a reading needs correcting. the keys are
- * big enough for gloves. in feet and inches there is no decimal point to hit: you type the
- * feet, tap FT, type the inches, tap IN, and anything after that is sixteenths.
- */
-/**
- * a little drawing of the measurement being asked for, because "from the corner" is easy to
- * misread when the plan is hidden behind the keypad. the arrow is the number to type.
- */
+/** a glove-friendly number pad for when the tape isn't connected or a reading needs fixing. */
+/** a tiny drawing of what to measure, since the plan is hidden behind the keypad. */
 function Picture({ kind }: { kind: 'from-corner' | 'width' }) {
   const theme = useTheme();
   const ink = theme.keyInk;
   const yellow = theme.accent;
   const navy = theme.keyDark;
   return (
-    // the drawing repeats the title, so screen readers skip it. (a View, because svg passes
-    // the prop straight into the browser, which complains.)
+    // screen readers skip it since it repeats the title; a `View` avoids a browser warning.
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Svg width="100%" height={64} viewBox="0 0 300 64">
         {/* the wall, a corner at the left, and the door or window sitting in it */}
@@ -172,8 +164,7 @@ export function Keypad({
     }
   }
 
-  // digits are grey keys. clear and delete are light tool keys, so they never look like a
-  // number. in feet and inches there is an extra row for them, under FT 0 IN.
+  // digits are grey keys; clear and delete are light so they never look like numbers.
   const rows =
     units === 'imperial'
       ? [

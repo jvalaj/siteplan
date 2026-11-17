@@ -2,11 +2,7 @@ import type { DatabaseSync } from 'node:sqlite';
 
 import { isNewer, type Layout } from '../src/shared/layout';
 
-/**
- * keeps the newest copy of each layout. the whole layout is stored as one json document: a
- * layout is small (a few dozen walls and features), it is always read and written whole, and
- * one writer owns it at a time, so separate tables would add work and nothing else.
- */
+/** keeps the newest copy of each layout as one json doc, since layouts are small and read whole. */
 export function createStore(db: DatabaseSync) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS layouts (
@@ -35,11 +31,7 @@ export function createStore(db: DatabaseSync) {
       return (selectAll.all() as { doc: string }[]).map((row) => JSON.parse(row.doc) as Layout);
     },
     get,
-    /**
-     * saves a layout if it is newer than the stored one, and returns whichever copy is now
-     * the newest. a phone that was offline may send an old copy; that must never overwrite a
-     * newer one.
-     */
+    /** saves a layout only if newer and returns the newest copy, so stale copies never win. */
     put(layout: Layout): Layout {
       const current = get(layout.id);
       if (current && !isNewer(layout, current)) return current;

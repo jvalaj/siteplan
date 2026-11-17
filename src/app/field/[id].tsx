@@ -82,8 +82,7 @@ export default function FieldEditor() {
       </View>
     );
   }
-  // the field editor is always light, whatever the phone is set to: a dark screen is much
-  // harder to read in direct sun. the office follows the system setting.
+  // always light in the field since dark mode is hard to read in sun; the office follows system.
   return (
     <ColorSchemeOverride value="light">
       <Editor layout={layout} />
@@ -112,8 +111,7 @@ function Editor({ layout }: { layout: Layout }) {
   const [keypad, setKeypad] = useState(false);
   const [folded, setFolded] = useState(false);
   const reduceMotion = useReduceMotion();
-  // pinch to zoom in on a corner, drag to move. a new wall glides back to the whole plan,
-  // so dana always sees where it went.
+  // pinch to zoom, drag to move; a new wall zooms back out so dana sees where it went.
   const { viewport, panHandlers, onLayout, wheelRef, fit, zoomBy } = usePanZoom();
   const zoomed = viewport.zoom !== 1 || viewport.panX !== 0 || viewport.panY !== 0;
   const wallCount = layout.walls.length;
@@ -138,8 +136,7 @@ function Editor({ layout }: { layout: Layout }) {
   const { walls } = layout;
   const selectedWall = walls.find((w) => w.id === selectedId);
   const selectedFeature = layout.features.find((f) => f.id === selectedId);
-  // features and extra measurements need a wall to go on. default to the newest one, which
-  // is nearly always the wall dana is standing at.
+  // features need a wall; default to the newest, which is usually where dana is standing.
   const wallInFocus =
     selectedWall ?? walls.find((w) => w.id === selectedFeature?.wallId) ?? walls[walls.length - 1];
 
@@ -257,8 +254,7 @@ function Editor({ layout }: { layout: Layout }) {
     }
   }
 
-  // listen for readings. re-subscribing on every render keeps `apply` up to date with what
-  // is currently armed.
+  // listen for readings; re-subscribing each render keeps `apply` up to date.
   useEffect(() => tape.onReading(apply));
 
   /** the on-screen stand-in for the button on dana's tape. */
@@ -281,8 +277,7 @@ function Editor({ layout }: { layout: Layout }) {
     setOffset(undefined);
   }
 
-  // deleting a whole plan can't be undone, so it sits in the "…" menu, not on the screen,
-  // and asks first. this is how apple's own apps handle it.
+  // deleting a plan can't be undone, so it lives in the "…" menu and asks first.
   function deletePlan() {
     const run = () => {
       deleteLayout(layout.id);
@@ -300,8 +295,7 @@ function Editor({ layout }: { layout: Layout }) {
     ]);
   }
 
-  // plans are named "Deck · 9:41 PM" so dana never has to type to start. once the job has a
-  // real name ("Smith deck"), she can give it one. the time stays, so two decks still differ.
+  // plans get a default name with the time so dana never has to type, and can rename later.
   function renamePlan() {
     const [kind, time] = layout.name.split(' · ');
     const save = (text?: string) => {
@@ -319,8 +313,7 @@ function Editor({ layout }: { layout: Layout }) {
     setOffset(undefined);
   }
 
-  // on a mac the whole job can be done from the keyboard: r reads, t types, 1 2 3 switch
-  // modes, the arrows turn or change wall. they pause while the keypad is open.
+  // keyboard shortcuts on a mac; they pause while the keypad is open.
   useShortcuts(
     {
       r: () => armed.kind !== 'none' && readDevice(),
@@ -634,9 +627,7 @@ function Editor({ layout }: { layout: Layout }) {
     </View>
   );
 
-  // the one line that matters: what the next press of the tape button will do. on a phone it
-  // sits on the plan, so it costs no room. on a big screen it's the display at the top of the
-  // control panel, right above the keys it describes.
+  // shows what the next tape press will do; on the plan on phones, atop the panel on big screens.
   const nextBar = (
     <View
       pointerEvents="box-none"
@@ -738,8 +729,7 @@ function Editor({ layout }: { layout: Layout }) {
             // in add mode, mark the corner the distance is measured from.
             measureFromWallId={mode === 'features' ? wallInFocus?.id : undefined}
           />
-          {/* zoom keys, the same as in the office. pinching works too, but not with a mouse,
-            and not with one gloved hand. top right, clear of the next bar at the bottom. */}
+          {/* zoom keys, since pinching doesn't work with a mouse or one gloved hand. */}
           <Pad style={styles.zoomPad}>
             {(
               [
@@ -765,9 +755,7 @@ function Editor({ layout }: { layout: Layout }) {
           <Toast id={result?.id ?? 0} text={result?.text} tone={result?.tone ?? 'green'} />
         </View>
         {sideBySide ? (
-          // on an ipad held sideways or a mac: one full-height panel. what's next at the top,
-          // every wall in the middle (tap one to measure it again), the keys at the bottom
-          // where the thumbs are.
+          // wide screens get one tall panel: next up on top, walls in the middle, keys below.
           <View style={[styles.sidePanel, { borderColor: theme.separator }]}>
             {nextBar}
             <WallList

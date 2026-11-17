@@ -31,8 +31,7 @@ export default function OfficeViewer() {
   const layout = useLayout(id);
   const { layouts } = useSync();
   const { width } = useWindowDimensions();
-  // on a big screen (ipad sideways, a mac) marcus keeps the list of plans on the left, like
-  // mail or notes, so he can flip between jobs without going back.
+  // on a big screen marcus keeps the plan list on the left, like mail, to flip between jobs.
   const sidebar = width >= 1100;
   const viewer = layout ? (
     // a new plan starts fresh: nothing selected, zoomed to fit.
@@ -144,14 +143,12 @@ function Viewer({ layout }: { layout: Layout }) {
           </Pad>
         </View>
 
-        {/* everything about the plan fits in one panel, with no scrolling: four readouts, and a
-          row of keys to step through the walls. */}
+        {/* the whole plan fits in one panel: four readouts and keys to step through walls. */}
         <View
           style={[
             wide ? styles.panelWide : styles.panelNarrow,
             { backgroundColor: theme.grouped, borderColor: theme.separator },
-            // the home bar only needs a little room. a full safe-area gap left an empty strip
-            // under the keys, so tuck them a bit closer.
+            // the home bar needs little room, so tuck the keys closer than the safe area.
             { paddingBottom: Math.max(insets.bottom - 14, Space.s) },
           ]}>
           <Inspector
@@ -169,10 +166,7 @@ function Viewer({ layout }: { layout: Layout }) {
 
 type Reading = { label: string; value: string; detail?: string };
 
-/**
- * one readout: a small label and a big number, like the display on a piece of test equipment.
- * the first readout is the one that matters most, and its number is orange.
- */
+/** one readout: small label, big number. the first matters most, so it's orange. */
 function Readout({ reading, main }: { reading: Reading; main?: boolean }) {
   const theme = useTheme();
   return (
@@ -256,8 +250,7 @@ function Inspector({
       extra(feature.id) ?? { label: 'Extra', value: '—' },
     ];
   } else {
-    // what an estimator needs for trim, baseboard or railing: the wall run with doors,
-    // windows and steps taken out.
+    // what estimators need for trim or railing: the wall run minus doors, windows and steps.
     const openings = layout.features.reduce((sum, f) => sum + f.widthMm, 0);
     const counts = new Map<string, number>();
     for (const f of layout.features) counts.set(f.kind, (counts.get(f.kind) ?? 0) + 1);
@@ -287,7 +280,7 @@ function Inspector({
   const step = (by: 1 | -1) => onSelect(stops[(at + by + stops.length) % stops.length]);
   const toggleUnits = () => updateSettings({ units: units === 'imperial' ? 'metric' : 'imperial' });
 
-  // on a mac: the arrows step through the walls, esc goes back to the whole plan, u swaps units.
+  // on a mac: arrows step through walls, esc shows the whole plan, u swaps units.
   useShortcuts({
     ArrowLeft: () => step(-1),
     ArrowUp: () => step(-1),

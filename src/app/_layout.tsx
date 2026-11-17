@@ -8,8 +8,7 @@ import { Button } from '@/components/ui';
 import { headerKeys } from '@/lib/header';
 import { useTheme } from '@/lib/theme';
 
-// in a browser, during development, react-native-svg logs "Unknown event handler property"
-// for every tappable shape. taps still work, so this is noise; hide just that message.
+// react-native-svg spams a harmless "unknown event handler" warning in browsers, so hide it.
 LogBox.ignoreLogs(['Unknown event handler property']);
 if (Platform.OS === 'web' && __DEV__) {
   const original = console.error;
@@ -19,10 +18,7 @@ if (Platform.OS === 'web' && __DEV__) {
   };
 }
 
-/**
- * the standard back arrow is small and thin. this one is a full square key, easy to hit with a
- * glove, and it looks like every other key in the app.
- */
+/** a big square back key that's easy to hit with a glove and matches the other keys. */
 function BackButton() {
   const router = useRouter();
   return (
@@ -51,8 +47,7 @@ export default function RootLayout() {
           headerTitleStyle: { color: theme.label },
           headerBackVisible: false,
           animation: 'slide_from_right',
-          // ios 26 makes the header see-through glass when it has no colour, and the plan then
-          // draws underneath the status bar. a solid colour keeps the page below the header.
+          // ios 26 makes a colorless header glass; a solid colour keeps the plan below it.
           headerStyle: { backgroundColor: theme.background },
           headerShadowVisible: false,
           ...headerKeys({ left: <BackButton />, right: <SyncPill /> }),
@@ -68,7 +63,7 @@ export default function RootLayout() {
                 source={require('../../assets/brand/reekon.png')}
                 accessibilityLabel="Reekon"
                 contentFit="contain"
-                // in a browser there's no back key beside it, so it needs its own gap from the edge.
+                // no back key beside it in a browser, so it needs its own gap from the edge.
                 style={{ width: 128, height: 38, marginLeft: Platform.OS === 'web' ? 16 : 0 }}
               />
             ),

@@ -3,15 +3,10 @@ import { Platform, StyleSheet, View } from 'react-native';
 
 import { Space } from '@/lib/theme';
 
-/**
- * on ios 26 every header button sits on a grey glass bubble. our keys already look like keys,
- * so the bubble just doubles them up. on ios we hand the keys over as "custom items" with the
- * bubble turned off. everywhere else the normal headerLeft / headerRight still work.
- */
+/** on ios 26, skip the glass bubble behind header buttons since our keys already look like keys. */
 export function headerKeys({ left, right }: { left?: ReactElement | null; right?: ReactElement }) {
   if (Platform.OS !== 'ios') {
-    // in a browser the header puts its buttons flush against the window edge. give them the
-    // same breathing room the phone header has.
+    // on web, pad header buttons off the window edge like the phone header does.
     const web = Platform.OS === 'web';
     return {
       ...(left !== undefined && {

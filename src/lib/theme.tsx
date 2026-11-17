@@ -1,8 +1,7 @@
 import { createContext, type ReactNode, useContext } from 'react';
 import { useColorScheme } from 'react-native';
 
-// colors start from apple's system palette, then go darker where needed. the app is used in
-// direct sun, so text and controls aim for 7:1 contrast rather than the usual 4.5:1.
+// apple's palette, darkened so text hits 7:1 contrast for use in direct sun.
 const light = {
   background: '#FFFFFF',
   grouped: '#F2F2F7',
@@ -32,8 +31,7 @@ const light = {
   orangeSoft: '#FBE9D9',
   purpleSoft: '#EEE4FB',
   tealSoft: '#D9F1F3',
-  // the keys. aluminium grey keys in a dark frame, like a piece of hardware, in reekon's own
-  // colours: its navy for the frame and the dark keys, its yellow for whatever is on.
+  // the keys: aluminium grey on a dark navy frame, in reekon's colours, yellow for what's on.
   keyFace: '#D3D3D7',
   keyDown: '#B9B9BE',
   keyLatched: '#C3C3C8',
@@ -77,8 +75,7 @@ const dark: typeof light = {
   orangeSoft: '#3A2408',
   purpleSoft: '#2A1B40',
   tealSoft: '#0B2E32',
-  // the keys. aluminium grey keys in a dark frame, like a piece of hardware, in reekon's own
-  // colours: its navy for the frame and the dark keys, its yellow for whatever is on.
+  // the keys: aluminium grey on a dark navy frame, in reekon's colours, yellow for what's on.
   keyFace: '#D3D3D7',
   keyDown: '#B9B9BE',
   keyLatched: '#C3C3C8',

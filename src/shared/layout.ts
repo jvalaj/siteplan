@@ -1,5 +1,4 @@
-// the layout document that dana edits in the field and marcus reads in the office.
-// everything is stored in millimeters. feet and inches are only for display.
+// the layout dana edits in the field and marcus reads in the office, stored in millimeters.
 
 export type SpaceKind = 'room' | 'deck' | 'patio';
 export type FeatureKind = 'door' | 'window' | 'post' | 'step';
@@ -7,11 +6,7 @@ export type FeatureKind = 'door' | 'window' | 'post' | 'step';
 /** where a number came from, so marcus knows how far to trust it. */
 export type Source = 'tape' | 'caliper' | 'typed' | 'computed';
 
-/**
- * one straight edge of the space. a room has walls and a deck has edges; the app calls them all
- * walls. `heading` is the direction dana walked, in degrees: 0 points right on the drawing and
- * 90 points down.
- */
+/** one straight edge (a wall); `heading` is the way dana walked: 0 is right, 90 is down. */
 export interface Wall {
   id: string;
   lengthMm: number;

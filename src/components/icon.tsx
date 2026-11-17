@@ -2,8 +2,7 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 import { type Theme, useTheme } from '@/lib/theme';
 
-// small line drawings, all on the same 24-point grid with the same line weight, so they read
-// as one family. a picture next to each word means nobody has to read to find a button.
+// small line icons on one 24-point grid so they look like a family and are easy to spot.
 const DRAWINGS = {
   // kinds of space
   room: (c: string) => (

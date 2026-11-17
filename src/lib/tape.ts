@@ -1,10 +1,4 @@
-// stand-in for dana's bluetooth tape measure and calipers.
-//
-// a real tape sends a reading when she presses its button. bluetooth needs native code that
-// expo go doesn't include, so here the "Read tape" button on screen plays the part of the
-// button on the tape. everything after that is the real path: a reading arrives as an event,
-// and the editor decides what it means. swapping in a real device later means replacing only
-// this file.
+// fake bluetooth tape: the on-screen "read tape" button stands in for the real tape's button.
 
 import { closingGap, corners, direction } from '@/shared/geometry';
 import type { FeatureKind, Layout, Source } from '@/shared/layout';
@@ -35,11 +29,7 @@ const jitter = (mm: number, spread = 3) => Math.round(mm + (Math.random() * 2 - 
 
 const WALL_LENGTHS = [1829, 2438, 3048, 3658, 4267, 4877];
 
-/**
- * a believable length for the next wall. if a wall in this direction could bring the outline
- * back in line with the first corner, it returns that length (plus a little error), the way a
- * real room's opposite walls nearly match. otherwise it returns a common building dimension.
- */
+/** a believable next wall length: one that nearly closes the outline, or a common size. */
 export function simulateWall(layout: Layout, heading: number) {
   const points = corners(layout.walls);
   const end = points[points.length - 1];

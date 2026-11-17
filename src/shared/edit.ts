@@ -1,5 +1,4 @@
-// every change dana can make to a layout, as plain functions: old layout in, new layout out.
-// keeping them free of screen code makes them easy to test and easy to undo.
+// every layout change as a plain function (old in, new out), so it's easy to test and undo.
 
 import { closingGap, CLOSE_TOLERANCE_MM, normalizeHeading } from './geometry';
 import {
@@ -37,11 +36,7 @@ export function reopen(layout: Layout): Layout {
   return { ...layout, closed: false };
 }
 
-/**
- * joins the outline back to the first corner. a small gap is measuring error, so the shape is
- * just marked closed. a large gap means there is one more wall dana hasn't measured, so that
- * wall is worked out from the gap and added, marked as "worked out" until she measures it.
- */
+/** closes the outline; a small gap is measuring error, a big one adds a "worked out" wall. */
 export function closeShape(layout: Layout): { layout: Layout; id?: string } {
   const gap = closingGap(layout.walls);
   if (gap.distanceMm <= CLOSE_TOLERANCE_MM) return { layout: { ...layout, closed: true } };
@@ -85,7 +80,7 @@ export function addMeasurement(
   return { ...layout, measurements: [...layout.measurements, measurement] };
 }
 
-/** "Wall 3", or "Door on wall 2": the name used for something everywhere in the app. */
+/** "wall 3", or "door on wall 2": the name used for something everywhere in the app. */
 export function describe(layout: Layout, id: string | undefined): string {
   if (!id) return '';
   const wallIndex = layout.walls.findIndex((w) => w.id === id);
@@ -99,11 +94,7 @@ export function describe(layout: Layout, id: string | undefined): string {
   return '';
 }
 
-/**
- * stamps an edited layout as the newest version: one revision higher than the copy it
- * replaces, with the time and who did it. `touchedId` is what the edit changed, so the
- * office view can point at it.
- */
+/** marks an edit as the newest version; `touchedId` is what changed, for the office view. */
 export function stamp(next: Layout, replaces: Layout, by: string, touchedId?: string): Layout {
   return { ...next, rev: replaces.rev + 1, updatedAt: Date.now(), updatedBy: by, touchedId };
 }

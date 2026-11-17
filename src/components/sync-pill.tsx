@@ -1,10 +1,7 @@
 import { Pill } from '@/components/ui';
 import { useSync } from '@/lib/sync';
 
-/**
- * says, in words, whether work has reached the office. it sits quietly in the corner rather
- * than interrupting: losing signal on a job site is normal, not an error.
- */
+/** quietly says if work reached the office; losing signal on site is normal, not an error. */
 export function SyncPill({ layoutId }: { layoutId?: string }) {
   const { status, unsent } = useSync();
   const waiting = layoutId ? unsent.includes(layoutId) : unsent.length > 0;

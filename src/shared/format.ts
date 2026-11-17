@@ -26,11 +26,7 @@ export function formatFeetInches(mm: number): string {
   return feet > 0 ? `${feet}' ${inchPart}` : inchPart;
 }
 
-/**
- * a length for display. caliper readings keep their fine detail (thousandths of an inch, or
- * hundredths of a millimeter) because rounding them to 1/16" would throw away the reason
- * calipers were used.
- */
+/** a length for display; caliper readings keep fine detail, since that's why calipers exist. */
 export function formatLength(mm: number, units: Units, source?: Source): string {
   if (source === 'caliper') {
     return units === 'imperial' ? `${(mm / MM_PER_INCH).toFixed(3)}"` : `${mm.toFixed(2)} mm`;

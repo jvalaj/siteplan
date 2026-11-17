@@ -19,10 +19,7 @@ export function normalizeHeading(heading: number): number {
   return ((heading % 360) + 360) % 360;
 }
 
-/**
- * the corners of the outline, starting at (0, 0). there is one more corner than there are walls:
- * the last one is where the last wall ends.
- */
+/** corners of the outline from (0, 0); one more corner than walls, the last is where it ends. */
 export function corners(walls: Wall[]): Point[] {
   const points: Point[] = [{ x: 0, y: 0 }];
   for (const wall of walls) {
@@ -41,11 +38,7 @@ export function wallEnds(walls: Wall[], wallId: string): { start: Point; end: Po
   return { start: points[index], end: points[index + 1] };
 }
 
-/**
- * how far the end of the last wall is from the first corner. on a real job this is never exactly
- * zero: it is the build-up of small measuring errors, and a big number means a wall was
- * measured wrong or a turn was missed.
- */
+/** gap between the last wall's end and the first corner; a big one means a bad reading. */
 export function closingGap(walls: Wall[]): { distanceMm: number; heading: number } {
   const points = corners(walls);
   const end = points[points.length - 1];
@@ -78,10 +71,7 @@ export function areaMm2(layout: Layout): number {
   return Math.abs(signedAreaMm2(layout.walls));
 }
 
-/**
- * unit vector pointing away from the inside of the shape, for a wall with this heading.
- * dimension labels and steps are drawn on that side.
- */
+/** unit vector pointing out of the shape for this heading; labels and steps go on that side. */
 export function outwardNormal(walls: Wall[], heading: number): Point {
   const d = direction(heading);
   // walking clockwise, the inside is on the right, so outside is on the left.

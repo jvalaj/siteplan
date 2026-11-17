@@ -1,8 +1,4 @@
-// the sync server. it does three things: keeps the newest copy of every layout in a sqlite
-// file, sends every connected device the full set when it connects, and passes each change
-// on to everyone else straight away.
-//
-// run it with `npm run server`. it needs node 22.13 or newer for the built-in sqlite.
+// sync server: keeps layouts in sqlite and relays changes; needs node 22.13+ for sqlite.
 
 import { mkdirSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -41,8 +37,7 @@ const server = createServer((req, res) => {
 });
 
 const wss = new WebSocketServer({ server, path: '/live', maxPayload: 1024 * 1024 });
-// the http server's own handler below reports listen errors; without this they would be thrown
-// a second time from here.
+// the http server's handler reports listen errors; this stops them being thrown twice.
 wss.on('error', () => {});
 
 const lastHeard = new Map<WebSocket, number>();
@@ -86,8 +81,7 @@ wss.on('connection', (socket) => {
     } else if (message.type === 'put' && isLayout(message.layout)) {
       const saved = store.put(message.layout);
       if (saved === message.layout) {
-        // it was newer than what we had: tell everyone, the sender included, so the sender
-        // knows it has been saved.
+        // it was newer: tell everyone, sender included, so the sender knows it was saved.
         broadcast({ type: 'layout', layout: saved });
       } else {
         // we already had a newer copy. send that back so the sender catches up.
@@ -103,8 +97,7 @@ wss.on('connection', (socket) => {
   socket.on('error', () => socket.terminate());
 });
 
-// devices ping every 15 seconds. one that has been silent for 45 has gone away without saying
-// so (no signal, flat battery), so stop holding its connection open.
+// devices ping every 15 s; one silent for 45 s is gone, so close its connection.
 setInterval(() => {
   const cutoff = Date.now() - 45_000;
   for (const [socket, heard] of lastHeard) {

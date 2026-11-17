@@ -17,17 +17,13 @@ function Name({ children }: { children: string }) {
   );
 }
 
-/**
- * the home screen is one piece of hardware: two big keys to pick who you are, and the
- * settings as rows of keys under them. the setting that is on stays pushed in, in orange.
- */
+/** the home screen: two big keys to pick who you are, with settings as rows of keys below. */
 export default function HomeScreen() {
   const router = useRouter();
   const settings = useSettings();
   const [open, setOpen] = useState<'haptics' | 'sounds'>();
   const { width, height } = useWindowDimensions();
-  // on an ipad or a mac the two big keys get bigger, and everything sits in the middle of the
-  // screen instead of in a strip at the top.
+  // on an ipad or mac the big keys grow and everything centers on the screen.
   const big = width >= 760 && height >= 600;
   const onOff = (value: boolean, set: (next: boolean) => void) => (
     <>
@@ -50,7 +46,9 @@ export default function HomeScreen() {
 
   return (
     <ScreenIn>
-      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={[styles.content, big && styles.contentBig]}>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={[styles.content, big && styles.contentBig]}>
         <Pad>
           <PadRow>
             <Button
@@ -104,8 +102,7 @@ export default function HomeScreen() {
           </PadRow>
         </Pad>
 
-        {/* the two settings you rarely touch fold away into square keys at the bottom. the icon
-          shows whether it is on; tap to open its off/on keys. */}
+        {/* rarely used settings fold into square keys; tap one for its off/on keys. */}
         <View style={styles.tray}>
           <Pad style={styles.tiny}>
             <PadRow>

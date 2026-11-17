@@ -68,8 +68,7 @@ export function LayoutRow({
       onPress={
         onPress ?? (() => router.push({ pathname: `/${to}/[id]`, params: { id: layout.id } }))
       }>
-      {/* the thumbnail is a little screen in a navy frame. a plan with no walls yet shows
-          the kind of space instead of an empty box. */}
+      {/* the thumbnail is a little screen; an empty plan shows its kind of space instead. */}
       <View
         style={[
           styles.thumbnail,
@@ -101,8 +100,7 @@ export function LayoutRow({
             </T>
           ) : null}
         </View>
-        {/* the number that matters, on a yellow tag like the "next" sticker. a plan that isn't
-            closed yet gets a plain grey tag instead. */}
+        {/* the main number on a yellow tag; plans that aren't closed get a plain grey tag. */}
         <View
           style={[
             styles.tag,
@@ -139,16 +137,12 @@ export function LayoutRow({
   );
 }
 
-/**
- * every plan, as one block of keys. on a phone it's one column. on an ipad or a mac, where one
- * long column wastes most of the screen, it's two.
- */
+/** every plan as a block of keys: one column on a phone, two on an ipad or mac. */
 export function PlanGrid({ layouts, to }: { layouts: Layout[]; to: 'field' | 'office' }) {
   const theme = useTheme();
   const { width } = useWindowDimensions();
   const columns = width >= 1300 ? 3 : width >= 900 ? 2 : 1;
-  // on a big screen: separate calm cards with space between them. a long grid of raised keys
-  // in dark seams was all lines and shadows. the phone keeps the one-block-of-keys look.
+  // big screens get calm separate cards; a grid of raised keys looked too busy.
   if (columns > 1) {
     return (
       <View style={styles.grid}>

@@ -1,9 +1,4 @@
-// the device's copy of every layout, and the live connection that keeps it in step with the
-// server.
-//
-// job sites have bad signal, so the app is "local first": every edit is saved on the device
-// straight away and shown straight away. sending it to the server is a second step that can
-// happen now or an hour from now. dana never waits for the network and never loses work.
+// local-first copy of every layout: edits save on the device now and sync to the server later.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
@@ -40,8 +35,7 @@ function set(patch: Partial<SyncState>, persist = true) {
   }
 }
 
-// the server runs on the computer that serves the app: the page's host in a browser, the dev
-// server's host on a phone. EXPO_PUBLIC_SERVER_URL overrides both.
+// the server lives on the host serving the app; `EXPO_PUBLIC_SERVER_URL` overrides it.
 function serverUrl() {
   if (process.env.EXPO_PUBLIC_SERVER_URL) return process.env.EXPO_PUBLIC_SERVER_URL;
   const host =
@@ -94,8 +88,7 @@ function connect() {
   ws.onopen = () => {
     lastHeard = Date.now();
     pingTimer = setInterval(() => {
-      // nothing from the server for a while means the connection is dead, even if the socket
-      // hasn't noticed (a phone that walked out of wi-fi range, a laptop that slept).
+      // no word from the server for a while means the connection is dead.
       if (Date.now() - lastHeard > PING_MS * 2 + 5000) retry();
       else send({ type: 'ping' });
     }, PING_MS);
@@ -123,8 +116,7 @@ function receive(message: ServerMessage) {
       const ours = state.layouts[theirs.id];
       layouts[theirs.id] = ours && isNewer(ours, theirs) ? ours : theirs;
     }
-    // 3. keep our own unsent layouts the server hasn't seen. anything else that is missing
-    //    from the server was deleted on another device.
+    // 3. keep our unsent layouts; anything else missing from the server was deleted elsewhere.
     for (const id of state.unsent) {
       if (state.layouts[id] && !layouts[id]) layouts[id] = state.layouts[id];
     }

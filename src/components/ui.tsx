@@ -40,11 +40,7 @@ export function T({
   );
 }
 
-/**
- * fades its contents in and slides them a short way into place when it appears. give it a new
- * `key` to play it again, for example when the screen switches to another mode. the motion is
- * short and small: it shows what changed and where it came from, then gets out of the way.
- */
+/** fades and slides its contents in on mount; change its `key` to replay it. */
 export function Appear({
   children,
   style,
@@ -85,10 +81,7 @@ export function Appear({
   );
 }
 
-/**
- * wraps a whole screen so it slides in when it opens. on a phone the navigation already slides
- * each screen in, so this only adds the motion in a browser, where pages would otherwise snap.
- */
+/** slides a screen in on open; only matters on web, since phones already animate screens. */
 export function ScreenIn({ children }: { children: ReactNode }) {
   if (Platform.OS !== 'web') return <View style={styles.screenIn}>{children}</View>;
   return (
@@ -98,11 +91,7 @@ export function ScreenIn({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * a message that drops in from the top, stays a moment, and leaves by itself, like a phone
- * notification. it reports what just happened without taking any room on the screen.
- * give it a new `id` each time there is something new to say.
- */
+/** a toast that drops in from the top and leaves by itself; give it a new `id` per message. */
 export function Toast({ id, text, tone }: { id: number; text?: string; tone: 'green' | 'orange' }) {
   const theme = useTheme();
   const reduce = useReduceMotion();
@@ -132,14 +121,12 @@ export function Toast({ id, text, tone }: { id: number; text?: string; tone: 'gr
       cancelAnimationFrame(arrive);
       clearTimeout(leave);
     };
-    // a new id means a new message, even when the words are the same as last time.
+    // new id means new message, even if the words are the same.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (!showing) return null;
-  // solid green when it worked, solid red when something needs a look: the color alone says
-  // which, from across the room. on a wide screen it stays a short pill in the middle instead
-  // of a bar across the whole plan.
+  // green for ok, red for a problem, readable from across the room; a pill on wide screens.
   const fill = showing.tone === 'green' ? theme.green : theme.red;
   return (
     <Animated.View
@@ -209,18 +196,7 @@ type ButtonProps = {
   big?: boolean;
   /** one key of a `Pad`: flat, square-cornered, and touching its neighbours. */
   cell?: boolean;
-  /**
-   * keys come in a few colors, like a piece of hardware, and the color says what kind of key
-   * it is:
-   * `primary` is the dark key, and there is only one per screen: the main thing to do.
-   * `selected` is solid orange and latched down: the choice that is on right now.
-   * `go` is solid orange but not latched: confirm, like "use it".
-   * `dark` is the dark key for a way out, like "cancel".
-   * `secondary` is aluminium grey: a choice you can make.
-   * `utility` is the light key: tools like undo, type, back and zoom.
-   * `destructive` and `danger` are grey with a red mark.
-   * `plain` has no key at all, just the mark.
-   */
+  /** key color says what kind of key it is, e.g. `primary` is the one main action per screen. */
   kind?:
     | 'primary'
     | 'secondary'
@@ -260,12 +236,10 @@ export function Button({
   const [down, setDown] = useState(false);
   const [hover, setHover] = useState(false);
 
-  // pressing pushes the key into the panel: it darkens and the shading flips, as if lit
-  // from above. nothing moves sideways or grows, because a real key doesn't.
+  // pressing darkens the key and flips the shading, like a real key pushed in.
   const latched = kind === 'selected';
   const pushed = down || latched;
-  // the face, and the color of the icon and words on it. black on orange and white on the
-  // dark key are the pairs with the strongest contrast.
+  // key face color and its text color, picked for the strongest contrast.
   const keys = {
     primary: [theme.keyDark, theme.keyDarkDown, 'onDark', 'onDark'],
     selected: [theme.accent, theme.accentDown, 'keyInk', 'keyInk'],
@@ -292,8 +266,7 @@ export function Button({
       disabled={disabled}
       onPressIn={() => setDown(true)}
       onPressOut={() => setDown(false)}
-      // with a mouse or trackpad (a mac, an ipad with a trackpad) the key under the pointer
-      // dims a touch, so you can tell what a click will hit.
+      // with a mouse, the hovered key dims a bit so you know what a click will hit.
       onHoverIn={() => setHover(true)}
       onHoverOut={() => setHover(false)}
       onPress={() => {
@@ -362,10 +335,7 @@ export function Button({
   );
 }
 
-/**
- * a key with anything on it, for rows that need more than an icon and a word (a plan in a
- * list, say). it looks and presses exactly like the other keys.
- */
+/** a key with any content on it, like a plan in a list; presses like the other keys. */
 export function KeyRow({
   children,
   label,
@@ -378,8 +348,7 @@ export function KeyRow({
   label: string;
   /** latched down in yellow, like a selected key. */
   selected?: boolean;
-  /** a calm card instead of a raised key: no bevel, one thin edge. for long grids of them on
-   * a big screen, where rows of bevels and dark seams turn into stripes. */
+  /** a flat card instead of a raised key, so big grids don't turn into stripes. */
   flat?: boolean;
   style?: StyleProp<ViewStyle>;
   onPress: () => void;
@@ -470,11 +439,7 @@ export function Pill({ label, tone }: { label: string; tone: 'green' | 'orange' 
   );
 }
 
-/**
- * a block of keys set into a dark frame, like a piece of hardware: one rounded panel cut into
- * pieces. the thin dark seams make each key its own target, so a gloved finger lands on one.
- * put `PadRow`s inside, and `Button cell`s inside those.
- */
+/** a block of keys in a dark frame, easy to hit with gloves; holds `PadRow`s of `Button cell`s. */
 export function Pad({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const theme = useTheme();
   return (
@@ -565,8 +530,7 @@ const styles = StyleSheet.create({
   big: { minHeight: 124, gap: Space.s },
   // a key on its own sits in its own thin dark frame.
   single: { borderWidth: FRAME_EDGE, borderRadius: KEY_RADIUS + FRAME_EDGE },
-  // light catches the top edge and the bottom edge is in shade: the key stands proud of the panel.
-  // the thick shaded lip along the bottom is the key's depth: it reads as a block you push.
+  // light top edge and a shaded bottom lip make the key look raised and pushable.
   resting: {
     boxShadow:
       'inset 0 2px 0 rgba(255, 255, 255, 0.9), inset 0 -5px 0 rgba(0, 0, 0, 0.16), inset 0 -6px 1px rgba(0, 0, 0, 0.06)',
@@ -575,8 +539,7 @@ const styles = StyleSheet.create({
   restingDark: {
     boxShadow: 'inset 0 1.5px 0 rgba(255, 255, 255, 0.22), inset 0 -5px 0 rgba(0, 0, 0, 0.4)',
   },
-  // pushed in: the lip disappears, the top edge falls into shadow, and the key sits a little
-  // lower, the way a real key travels.
+  // pushed in: the lip goes away and the key sits lower, like a real key.
   pushed: {
     boxShadow: 'inset 0 4px 6px rgba(0, 0, 0, 0.32), inset 0 -1px 0 rgba(255, 255, 255, 0.25)',
     transform: [{ translateY: 1.5 }],
@@ -586,8 +549,7 @@ const styles = StyleSheet.create({
   flat: { borderWidth: StyleSheet.hairlineWidth * 2, borderRadius: 16 },
   flatDown: { transform: [{ scale: 0.99 }] },
   cellSlot: { flex: 1 },
-  // corners are concentric, the way apple draws nested shapes: a key's corner is the frame's
-  // corner minus the frame's edge and padding (14 - 2 - 2 = 10), so the curves run parallel.
+  // key corner = frame corner minus edge and padding (14 - 2 - 2 = 10), so the curves match.
   cell: { borderRadius: KEY_RADIUS, paddingHorizontal: Space.xs },
   pad: {
     borderRadius: KEY_RADIUS + FRAME_EDGE + FRAME_PADDING,

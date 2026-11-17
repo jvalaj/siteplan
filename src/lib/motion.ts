@@ -1,11 +1,4 @@
-// the app's animations. each one has a job:
-//
-//   - a new wall draws itself from its corner, so you see which way it went and that the
-//     reading landed.
-//   - the plan glides when it has to re-fit, so you never lose your place.
-//   - buttons give a little under the finger, so a press feels like a press through gloves.
-//
-// all of them switch off when the phone's "Reduce Motion" setting is on.
+// the app's animations, each with a job; all switch off when "reduce motion" is on.
 
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Easing } from 'react-native';
@@ -27,14 +20,10 @@ export function useReduceMotion() {
 
 type Numbers = Record<string, number>;
 
-/**
- * follows a set of numbers smoothly: when the target changes, the returned values glide to it
- * instead of jumping. used for the plan's zoom and position.
- */
+/** glides numbers to a new target instead of jumping; used for the plan's zoom and position. */
 export function useEased<T extends Numbers>(target: T, enabled: boolean, ms = 380): T {
   const [shown, setShown] = useState(target);
-  // whether there is a sensible starting point to glide from. the very first target (before
-  // the view has been measured) is not one, so that one is shown at once.
+  // the very first target (before the view is measured) shows at once instead of gliding.
   const primed = useRef(false);
   const key = Object.values(target).join(',');
 
@@ -69,10 +58,7 @@ export function useEased<T extends Numbers>(target: T, enabled: boolean, ms = 38
   return enabled ? shown : target;
 }
 
-/**
- * counts from 0 to 1 each time `id` changes to something new. the plan uses it to draw the
- * newest wall in. it does not run for whatever was already there when the screen opened.
- */
+/** counts 0 to 1 each time `id` changes, to draw the newest wall in. */
 export function useDrawIn(id: string | undefined, enabled: boolean, ms = 420) {
   const [state, setState] = useState({ id, progress: 1 });
 
