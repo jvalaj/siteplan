@@ -10,7 +10,9 @@
 
 **the gap is shown, not hidden.** readings never add up perfectly, so the plan shows how far the end is from the start. a small gap closes quietly. a big gap means a wall is missing, so "close shape" adds a dashed "worked out" wall until someone measures it.
 
-**doors and windows take two readings:** distance from the corner, then width. the starting corner is marked yellow with an arrow, so a door never lands at the wrong end.
+**doors and windows take two readings:** distance from the corner, then width. the starting corner is marked yellow with an arrow, so a door never lands at the wrong end. picking a door opens the keypad by itself for both numbers, so nothing is missed.
+
+**out of order gets a warning.** if she tries to add a door before any wall exists, the "next" display turns red with a "!" and tells her what to do first.
 
 **every animation has a reason.** new walls draw out from their corner, the plan glides when it re-fits, and results drop in from the top, green when it worked and red when something needs a look. reduce motion turns it all off.
 
@@ -22,6 +24,7 @@
 - the field screen is always black on white, because dark screens are hard to read outside.
 - it works offline. edits save on the phone first and sync later.
 - undo says what it undid, since wet screens cause wrong taps.
+- tapping a wall or door shows a remove key. removing a wall leaves a visible gap instead of breaking the shape.
 - pinch or the zoom keys get into a tight corner, and fit brings the whole plan back.
 - rename and delete sit in the "…" menu, and delete asks first.
 - on an ipad held sideways, the controls become one tall panel: next on top, every wall in the middle, keys at the bottom near her thumbs.
