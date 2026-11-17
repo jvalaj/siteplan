@@ -1,56 +1,77 @@
-# Welcome to your Expo app 👋
+# Siteplan
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A layout tool for a construction crew. Dana lays out a space on site with her tape measure, and
+Marcus sees it in the office as she works.
 
-## Get started
+| Path         | What it is                                                           |
+| ------------ | -------------------------------------------------------------------- |
+| `src/app`    | The Expo app: the field editor (Dana) and the office viewer (Marcus) |
+| `src/shared` | The layout model, geometry and formatting, used by app and server    |
+| `server`     | A small Node server that stores layouts and pushes changes live      |
+| `test`       | Tests for the geometry, the edits and the server's store             |
 
-1. Install dependencies
+## Setup
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+You need **Node 22.13 or newer** (the server uses the built-in `node:sqlite`). No Docker, Xcode
+or Android Studio.
 
 ```bash
-npm run reset-project
+npm install
+npm run dev
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+`npm run dev` starts the sync server on port 4100 and the Expo dev server on port 8081.
 
-### Other setup steps
+- **Phone or tablet:** install Expo Go and sign in to an Expo account in it. Sign in on the
+  computer too with `npx expo login` (current Expo Go requires both). Put the device on the same
+  Wi-Fi as the computer and scan the QR code in the terminal. The device needs to reach ports
+  8081 and 4100.
+- **Browser:** press `w` in the terminal, or open http://localhost:8081.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+The app uses Expo SDK 58, the version the current Expo Go supports. Everything it uses ships
+inside Expo Go, so no development build is needed.
 
-## Learn more
+If your network blocks device-to-device traffic, `npm run dev -- --tunnel` tunnels the Expo dev
+server. You would also need to expose port 4100 and set `EXPO_PUBLIC_SERVER_URL` (for example
+`ws://your-host:4100`) before starting.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Trying it
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Open the app on two devices (or a phone and a browser).
 
-## Join the community
+1. On one, tap **Office**. This is Marcus.
+2. On the other, tap **Field**, then **Room**, **Deck** or **Patio**. This is Dana.
+3. Tap **Read** four times. Each press stands in for the button on Dana's Bluetooth tape. The
+   walls draw themselves, and a four-sided space closes by itself.
+4. Tap **Add**, pick Door or Window, and tap **Read** twice: once for the distance from the
+   corner, once for the width.
+5. Tap **Size** to pin a height or depth to a wall, with the tape or calipers.
+6. Watch the office device: every change shows up as it happens. Pinch, drag, or use the zoom
+   buttons, and tap any wall or feature to inspect it.
+7. Turn off Wi-Fi on the field device and keep working. It says "Saved on phone" and
+   catches the office up when the connection returns.
 
-Join our community of developers creating universal apps.
+On an iPad held sideways or a Mac browser, Office keeps the plan list on the left and lists
+every wall beside the plan.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Keyboard (Mac / browser)
+
+| Field | | Office | |
+| --- | --- | --- | --- |
+| `R` | read | `←` `→` | step through walls |
+| `T` | type a number (then digits, `F`/`'` feet, `I`/`"` inches, `Enter`) | `+` `-` `0` | zoom in, out, fit |
+| `1` `2` `3` | Walls, Add, Size | `U` | swap ft / mm |
+| `←` `→` | turn left / right, or change wall | `Esc` | back to the whole plan |
+| `⌘Z` | undo | | |
+
+## Other scripts
+
+| Command             | What it does                          |
+| ------------------- | ------------------------------------- |
+| `npm run server`    | Sync server only (restarts on change) |
+| `npm run app`       | Expo dev server only                  |
+| `npm test`          | Tests                                 |
+| `npm run typecheck` | TypeScript                            |
+| `npm run lint`      | ESLint                                |
+
+Layouts are stored in `server/data/siteplan.db`. Delete that file to start fresh.
